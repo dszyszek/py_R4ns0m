@@ -64,3 +64,12 @@ def decrypt(key_in, file_path):
             output_file.truncate(file_size_info)
 
     os.remove(file_path)
+
+
+def generate_key(passwd):
+    sha = SHA256.new(passwd.encode('utf-8'))
+    return sha.digest()
+
+
+if __name__ == '__main__':
+    pass
