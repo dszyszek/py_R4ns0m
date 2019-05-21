@@ -71,5 +71,14 @@ def generate_key(passwd):
     return sha.digest()
 
 
+def generate_password():
+    return_pass = ''
+    charackers = 'abcdfghijklmnopqrstuvwxyzACDEFGHIJKLNOPQRSTUVWXYZ0123456789$_-'
+    for n in range(1,17):
+        r = int(os.urandom(6).hex(), 16) % 62
+        return_pass += charackers[r]
+    return return_pass
+
+
 if __name__ == '__main__':
     pass
