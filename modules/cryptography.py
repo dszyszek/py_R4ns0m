@@ -80,5 +80,15 @@ def generate_password():
     return return_pass
 
 
+def normalize_key(key_in):
+    key = ''
+    list_of_chars = key_in.split('.')
+
+    for c in list_of_chars:
+        key += chr(int(c))
+
+    return key.encode('latin-1')
+
+
 if __name__ == '__main__':
     pass
