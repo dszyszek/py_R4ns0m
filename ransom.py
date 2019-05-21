@@ -49,6 +49,19 @@ class Ransomware:
         new_password = modules.cryptography.generate_password()
         return new_password
 
+    
+    def handle_key(self):
+        key = modules.cryptography.generate_key(passwd)
+        bin_key = ''
+
+        for c in key:
+            bin_key += str(c) + '.'
+
+        return {
+                "key": key,
+                "bin_key": bin_key[:-1]
+                }
+
 if __name__ == '__main__':
     pass
 
