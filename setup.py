@@ -67,7 +67,7 @@ def handle_email_validation():
     email = input('Email address: ')
     validation = modules.validate_input.validate_email(email)
 
-    while not validation:
+    if not validation:
         print(colored('Email is wrong!', color='red'))
         handle_email_validation()
 

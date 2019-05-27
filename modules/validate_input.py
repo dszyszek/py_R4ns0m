@@ -11,7 +11,7 @@ def validate_length(key_dec):
 
 
 def validate_email(email):
-    validate = re.search('.+@gmail.com', email)
+    validate = re.search('.+@gmail\.com', email)
 
     try:
         validate.group(0)
