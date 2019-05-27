@@ -17,6 +17,8 @@ There are several features, to make program better:
 - Closing the GUI prompt is disabled (because this window is the only wawy to decrypt data, so it'll be better to not close this)
 - Wallpaper of victims computer will be changed to frog.jpg file
 - Length of key the victim input is validated
+<br>
+If you want to see ransomware in action, there is a working example provided in repo (remember to open it ONLY in safe environment for testing purposes (virtual machine etc.)). If you are going to compile program, just delete /working_example directory.
 
 ## Usage
 
@@ -24,7 +26,7 @@ Ok, so after you set the program up with (in main dir): <br>
 ```$ python3 setup.py``` <br>
 ransomware is ready to go.<br>
 If you want program to behave like trojan, you can pack everything up with pyinstaller. Type: <br>
-```pyinstaller ./ransom.py --add-data "<path to fake file (pdf, jpg)>;." --add-data "./img/frog.jpg;." --onefile --noconsole --icon "<path to icon of fake file>"``` <br>
+```pyinstaller ./ransom.py --add-data "<path to fake file (pdf, jpg)>;." --add-data "./img/frog.jpg;." --add-data "./user_data/user.json;." --onefile --noconsole --icon "<path to icon of fake file>"``` <br>
 in main dir. After that you'll have standalone ransomware, ready to launch.
 
 ## Info
