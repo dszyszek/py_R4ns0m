@@ -1,5 +1,5 @@
 pyfiglet==0.7.6
-requests==2.20.1
+requests==2.31.0
 termcolor==1.1.0
 pycrypto==2.6.1
 Pillow==6.0.0
